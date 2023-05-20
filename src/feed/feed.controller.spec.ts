@@ -5,16 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Config } from '../config/data-source';
 import { Feed } from '../entity/Feed';
 import feedData  from '../../data/mock_data.json';
-// import { getRepository } from 'typeorm';
-// import { FeedSeeder, seeder } from './seeders/feed.seeder';
 
 
 
 describe('FeedController', () => {
   let feedController: FeedController;
   let feedService: FeedService;
-  // let feedRepository: Repository<Feed>;
-  // let FeedSeeder: FeedSeeder;
 
   beforeEach(async () => {
     const feed: TestingModule = await Test.createTestingModule({
@@ -26,17 +22,6 @@ describe('FeedController', () => {
     feedController = feed.get<FeedController>(FeedController);
     feedService = feed.get<FeedService>(FeedService);
     await feedService.runSeeder()
-
-    // function bufferTIme() {
-    //   return new Promise<void>((resolve, reject) => {
-    //     setTimeout(() => {
-    //       resolve()
-    //     }, 1000)
-    //   })
-    // }
-    // await bufferTIme()
-    
-    // feedRepository = feed.selectContextModule(new Repository(Feed)) //(new Repository(Feed))
   });
 
   describe('1) Feed Seeder', () => {
@@ -108,7 +93,6 @@ describe('FeedController', () => {
         "description": "Nihil hic neque dignissimos totam omnis ut aut. Fugiat voluptatem rem quisquam provident est odit. Necessitatibus veniam architecto quia. Rerum deserunt reiciendis velit voluptatem tempora iusto similique. Atque mollitia pariatur quia voluptatem qui laborum laborum rerum molestias.",
         "dateLastEdited": "2018-08-06T08:27:26.187Z"
     }
-    console.log("searchFeedResponse: ", searchFeedResponse)
     expect(searchFeedResponse.data.length).toEqual(1);
     expect(searchFeedResponse.data[0].name).toBe(expectedResponseData.name);
     expect(searchFeedResponse.data[0].description).toBe(expectedResponseData.description);
@@ -143,7 +127,6 @@ describe('FeedController', () => {
         "description": "Fugiat praesentium aspernatur accusantium praesentium blanditiis modi. Ipsam dignissimos odio eum aut fugit aliquam error facilis explicabo. Voluptatum eaque ullam voluptate hic dolorem dolores ab quod. Incidunt consequatur nam et voluptatem reprehenderit quibusdam hic aut. Architecto voluptas numquam est natus quis. Reprehenderit eaque voluptas voluptas nihil cupiditate.",
         "dateLastEdited": "2017-12-28T04:21:00.923Z"
     }]
-    console.log("searchFeedResponse: ", searchFeedResponse)
     expect(searchFeedResponse.data.length).toEqual(expectedResponseData.length);
   })
 

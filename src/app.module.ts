@@ -15,7 +15,6 @@ import { FeedSeeder } from './feed/seeders/feed.seeder'
     controllers: [AppController, FeedController],
     providers: [FeedService, FeedSeeder]
 })
-// export class AppModule {}
 
 export class AppModule implements OnApplicationBootstrap {
     constructor(

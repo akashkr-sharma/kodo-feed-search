@@ -18,8 +18,6 @@ export class FeedSeeder {
       const feedObject = this.feedRepository.create(feed);
       await this.feedRepository.save(feedObject);
     }
-    const count = await this.feedRepository.count();
-    console.log('seed successfully run: ', count);
   }
 }
 
@@ -29,8 +27,6 @@ export const seeder = async(feedRepository) => {
         const feed = feedData[i]
         await feedRepository.insert(new FeedCreationDto(feed))
     }
-    const count = await feedRepository.count()
-    console.log("seeding complete: ", count)
     
 }
 

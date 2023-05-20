@@ -11,19 +11,17 @@ export class FeedService {
     constructor(
         @InjectRepository(Feed)
         private feedRepository: Repository<Feed>,
-    ) {
-        // this.runSeeder()
-    }
+    ) {}
 
     async runSeeder() {
         await seeder(this.feedRepository)
     }
 
     async getAllFeed() {
-        const found = await this.feedRepository.find({order: {dateLastEdited: "DESC"}});
+        const result = await this.feedRepository.find({order: {dateLastEdited: "DESC"}});
         const totalCount = await this.feedRepository.count();
         const pagination: Pagination = await this.getPaginationObject(totalCount, 0, totalCount);
-        return this.createFeedPageObject(found, pagination);
+        return this.createFeedPageObject(result, pagination);
     }
 
     
@@ -70,7 +68,6 @@ export class FeedService {
         const result: Array<Feed> = await this.feedRepository.manager.getRepository(Feed).find(query)
 
         const totalCount = await this.feedRepository.manager.getRepository(Feed).count(query);
-        // console.log("totalCount: ", totalCount, result.length)
         const pagination: Pagination = await this.getPaginationObject(totalCount, page, limit);
         return this.createFeedPageObject(result, pagination);
     }
