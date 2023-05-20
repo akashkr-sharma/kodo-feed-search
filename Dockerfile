@@ -4,4 +4,5 @@ COPY . .
 RUN npm install -g @nestjs/cli
 RUN yarn install
 EXPOSE 3000
-CMD ["yarn", "start:dev"]
+CMD ["yarn", "build"]
+CMD ["yarn", "start:prod"]
