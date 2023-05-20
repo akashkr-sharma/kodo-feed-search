@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Feed } from '../entity/Feed';
-import { Repository } from 'typeorm';
+import { And, FindManyOptions, FindOneOptions, FindOptionsWhere, In, Like, Repository, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-
 import {seeder} from './seeders/feed.seeder';
 import { FeedPageObject, Pagination } from './dto/feed.dto';
 
@@ -23,29 +22,58 @@ export class FeedService {
         return this.createFeedPageObject(found, pagination);
     }
 
-    async getFeedObject(key: string, page: number, limit: number) : Promise<FeedPageObject> {
+    
+    feedQueryBuilder(key: string, page, limit) :FindManyOptions<Feed> {
+        let query: FindManyOptions<Feed>;
         const offset = page*limit;
-        let keys: Array<string> = key.split("\"")
-        if (keys.length>1){
 
+        query = {
+            order: {
+                dateLastEdited: "DESC"
+            },
+            skip: offset,
+            take: limit
+        }
+        let keys: Array<string> = key.split("\"")
+        
+        if (!key || !keys[1]){
+            return query;
+        }
+        if (keys.length>1){
+            query["where"] = {
+                name: Like(`%${keys[1]}%`)
+            }
         }else{
             keys = key.split(" ")
-            console.log("keys: ", keys)
+            let str: string = "";
+            keys.forEach(key => {
+                str+=`%${key}%`
+            })
+            query["where"] = [{
+                name: Like(`%${str}%`)
+            }, {
+                description: Like(`%${str}%`)
+            }]
         }
+        return query
+    }
 
+    async getFeedObject(key: string, page: number, limit: number) : Promise<FeedPageObject> {
+        
+        
+        const query: FindManyOptions<Feed> = this.feedQueryBuilder(key, page, limit);
+        
+        const result: Array<Feed> = await this.feedRepository.manager.getRepository(Feed).find(query)
 
-        const found = []
-        if (!found) {
-            throw new NotFoundException('No data found');
-        }
-        const totalCount = await this.feedRepository.count();
+        const totalCount = await this.feedRepository.manager.getRepository(Feed).count(query);
+        // console.log("totalCount: ", totalCount, result.length)
         const pagination: Pagination = await this.getPaginationObject(totalCount, page, limit);
-        return this.createFeedPageObject(found, pagination);
+        return this.createFeedPageObject(result, pagination);
     }
 
 
     async getPaginationObject(totalCount: number, page: number, limit: number) : Promise<Pagination> {
-        const totalPage = Math.floor(totalCount/limit)
+        const totalPage = Math.ceil(totalCount/limit)
         const paginationObject = new Pagination();
         paginationObject.page = page;
         paginationObject.totalPage = totalPage;

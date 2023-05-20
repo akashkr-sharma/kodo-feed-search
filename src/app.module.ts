@@ -4,17 +4,10 @@ import { FeedService } from './feed/feed.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Feed } from './entity/Feed';
 import { AppController } from './app.contoller';
+import { Config } from './config/data-source'
 
 @Module({
-    imports: [TypeOrmModule.forRoot({
-        type: "sqlite",
-        database: ":memory:",
-        dropSchema: true,
-        entities: [Feed],
-        synchronize: true,
-        logging: false,
-        
-    }), TypeOrmModule.forFeature([Feed])],
+    imports: [TypeOrmModule.forRoot(Config), TypeOrmModule.forFeature([Feed])],
     controllers: [AppController, FeedController],
     providers: [FeedService],
 })
