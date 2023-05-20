@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Feed } from '../entity/Feed';
-import { And, FindManyOptions, FindOneOptions, FindOptionsWhere, In, Like, Repository, SelectQueryBuilder } from 'typeorm';
+import { FindManyOptions, Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {seeder} from './seeders/feed.seeder';
 import { FeedPageObject, Pagination } from './dto/feed.dto';
@@ -12,11 +12,15 @@ export class FeedService {
         @InjectRepository(Feed)
         private feedRepository: Repository<Feed>,
     ) {
-        seeder(feedRepository)
+        // this.runSeeder()
+    }
+
+    async runSeeder() {
+        await seeder(this.feedRepository)
     }
 
     async getAllFeed() {
-        const found = await this.feedRepository.find();
+        const found = await this.feedRepository.find({order: {dateLastEdited: "DESC"}});
         const totalCount = await this.feedRepository.count();
         const pagination: Pagination = await this.getPaginationObject(totalCount, 0, totalCount);
         return this.createFeedPageObject(found, pagination);
@@ -35,8 +39,8 @@ export class FeedService {
             take: limit
         }
         let keys: Array<string> = key.split("\"")
-        
-        if (!key || !keys[1]){
+
+        if (!key || (keys.length>1 && !keys[1])){
             return query;
         }
         if (keys.length>1){
@@ -82,7 +86,7 @@ export class FeedService {
 
     createFeedPageObject(feeds: Feed[], pagination: Pagination): FeedPageObject {
         const feedPageObject = new FeedPageObject();
-        feedPageObject.feeds = feeds;
+        feedPageObject.data = feeds;
         feedPageObject.pagination = pagination;
         return feedPageObject;
     }

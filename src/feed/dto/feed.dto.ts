@@ -31,7 +31,7 @@ export class Pagination {
 
 
 export class FeedPageObject {
-    feeds: Feed[];
+    data: Feed[];
 
     pagination: Pagination;
 }

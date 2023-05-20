@@ -5,12 +5,11 @@ import { FeedService } from './feed.service';
 export class FeedController {
     constructor(private readonly feedService: FeedService) {}
 
-    /**
-     * @Get('/')
-     * getAllFeed() {
-     *     return this.feedService.getAllFeed()
-     * }
-    */
+    @Get('/')
+    getAllFeed() {
+        return this.feedService.getAllFeed()
+    }
+
 
     @Get("/search")
     getFeedData(
