@@ -19,13 +19,14 @@ __Table of content__
 - [Install](#install)
 - [Configure and Run](#configure-and-run)
 - [Test](#test)
+- [Kubernates Setup](#kube-setup)
 - [Postman](#postman)
 - [Authors](#authors)
 
 
 # Install
 > Pre-requirement
-**node.js**, **yarn**
+**node.js**, **yarn**, **minikube**, **kubectl**
 
 ```bash
 $ git clone https://github.com/akashkr-sharma/koto-feed-search
@@ -57,6 +58,13 @@ $ yarn run test:e2e
 
 # test coverage
 $ yarn run test:cov
+```
+
+## Kube Setup
+```bash
+$ minikube start
+$ minikube tunnel
+$ helm install feed-search my-helm
 ```
 
 ## Postman
