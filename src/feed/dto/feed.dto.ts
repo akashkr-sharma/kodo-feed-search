@@ -1,7 +1,6 @@
 import { IsString, IsUrl, IsOptional, IsDate } from "class-validator";
-import { Feed } from "../../entity/Feed";
 
-export class FeedCreationDto {
+export class FeedDto {
     @IsString()
     name: string;
 
@@ -31,7 +30,7 @@ export class Pagination {
 
 
 export class FeedPageObject {
-    data: Feed[];
+    data: FeedDto[];
 
     pagination: Pagination;
 }

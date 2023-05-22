@@ -1,27 +1,17 @@
-import { Module, OnApplicationBootstrap } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { FeedController } from './feed/feed.controller';
 import { FeedService } from './feed/feed.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Feed } from './entity/Feed';
 import { AppController } from './app.contoller';
-import { Config } from './config/data-source';
-import { FeedSeeder } from './feed/seeders/feed.seeder'
+import { FeedRepository } from './feed/feed.repository';
 
 
 
 
 @Module({
-    imports: [TypeOrmModule.forRoot(Config), TypeOrmModule.forFeature([Feed])],
+    imports: [],
     controllers: [AppController, FeedController],
-    providers: [FeedService, FeedSeeder]
+    providers: [FeedService, FeedRepository]
 })
 
-export class AppModule implements OnApplicationBootstrap {
-    constructor(
-      private readonly feedSeeder: FeedSeeder,
-    ) {}
+export class AppModule{}
 
-    async onApplicationBootstrap(): Promise<void> {
-      await this.feedSeeder.seed();
-    }
-  }
