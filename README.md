@@ -10,7 +10,6 @@
 
 [![Nodejs version](https://img.shields.io/badge/nodejs-16.20.0-blue.svg)](https://nodejs.org/en/blog/release/v16.20.0/) 
 [![yarn](https://img.shields.io/badge/yarn-1.22.19-%23ff3300.svg)](https://github.com/yarnpkg/yarn#readme)
-[![TypeORM](https://img.shields.io/badge/TypeORM-0.3.16-green.svg)](https://github.com/typeorm/typeorm)
 [![nestjs](https://img.shields.io/badge/nestjs-9.5.0-%23990099.svg)](https://github.com/nestjs/nest)
 
 

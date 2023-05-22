@@ -1,10 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FeedController } from './feed.controller';
 import { FeedService } from './feed.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Config } from '../config/data-source';
-import { Feed } from '../entity/Feed';
 import feedData  from '../../data/mock_data.json';
+import { FeedRepository } from './feed.repository';
 
 
 
@@ -14,14 +12,14 @@ describe('FeedController', () => {
 
   beforeEach(async () => {
     const feed: TestingModule = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(Config), TypeOrmModule.forFeature([Feed])],
+      imports: [],
       controllers: [FeedController],
-      providers: [FeedService],
+      providers: [FeedService, FeedRepository],
     }).compile();
 
     feedController = feed.get<FeedController>(FeedController);
     feedService = feed.get<FeedService>(FeedService);
-    await feedService.runSeeder()
+    // await feedService.runSeeder()
   });
 
   describe('1) Feed Seeder', () => {
@@ -50,14 +48,14 @@ describe('FeedController', () => {
 
   beforeEach(async () => {
     const feed: TestingModule = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(Config), TypeOrmModule.forFeature([Feed])],
+      imports: [],
       controllers: [FeedController],
-      providers: [FeedService],
+      providers: [FeedService, FeedRepository],
     }).compile();
 
     feedController = feed.get<FeedController>(FeedController);
     feedService = feed.get<FeedService>(FeedService);
-    await feedService.runSeeder()
+    // await feedService.runSeeder()
   });
 
 
@@ -87,15 +85,21 @@ describe('FeedController', () => {
     const responseDataLimit = 20;
     const page = 0;
     const searchFeedResponse = await feedController.getFeedData(`"The King"`, page, responseDataLimit);
-    const expectedResponseData = {
+    const expectedResponseData = [{
         "name": "The Lord of the Rings: The Return of the King",
         "image": "https://picsum.photos/640/480",
         "description": "Nihil hic neque dignissimos totam omnis ut aut. Fugiat voluptatem rem quisquam provident est odit. Necessitatibus veniam architecto quia. Rerum deserunt reiciendis velit voluptatem tempora iusto similique. Atque mollitia pariatur quia voluptatem qui laborum laborum rerum molestias.",
         "dateLastEdited": "2018-08-06T08:27:26.187Z"
-    }
-    expect(searchFeedResponse.data.length).toEqual(1);
-    expect(searchFeedResponse.data[0].name).toBe(expectedResponseData.name);
-    expect(searchFeedResponse.data[0].description).toBe(expectedResponseData.description);
+    },
+    {
+        "name": "Human Web Agent",
+        "image": "https://picsum.photos/640/480",
+        "description": "Vitae dolor natus aut aut. Totam dolor porro. Rem est repellendus voluptas eos soluta. The Lord of the Rings: The Return of the King",
+        "dateLastEdited": "2018-04-16T09:57:36.659Z"
+    }]
+    expect(searchFeedResponse.data.length).toEqual(expectedResponseData.length);
+    expect(searchFeedResponse.data[0].name).toBe(expectedResponseData[0].name);
+    expect(searchFeedResponse.data[0].description).toBe(expectedResponseData[0].description);
   })
 
 
@@ -128,6 +132,16 @@ describe('FeedController', () => {
         "dateLastEdited": "2017-12-28T04:21:00.923Z"
     }]
     expect(searchFeedResponse.data.length).toEqual(expectedResponseData.length);
+  })
+
+  it('6) feed controller: getFeedData() with key=The King Akash (without quote)',async () => {
+    const responseDataLimit = 20;
+    const page = 0;
+    const searchFeedResponse = await feedController.getFeedData('The King Akash', page, responseDataLimit);
+    const expectedResponseData = [];
+    const expectedResponseTotalPage = 0;
+    expect(searchFeedResponse.data.length).toEqual(expectedResponseData.length);
+    expect(searchFeedResponse.pagination.totalPage).toEqual(expectedResponseTotalPage);
   })
 
 })
