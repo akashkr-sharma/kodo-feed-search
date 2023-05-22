@@ -46,10 +46,12 @@ export class FeedRepository {
      * if we need to create feedData then using create function we can add data in @param Data
      * and then sort those on the basis of dateLastEdited key in desc order
      */
-    create(feedDtoObject: FeedDto){
-        this.Data.push(new FeedDto(feedDtoObject));
-        this.sortData()
-    }
+    /**
+     * create(feedDtoObject: FeedDto){
+     *  this.Data.push(new FeedDto(feedDtoObject));
+     * this.sortData()
+     * }
+     */
 
     /**
      * 
