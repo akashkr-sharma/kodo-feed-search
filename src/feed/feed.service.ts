@@ -1,75 +1,60 @@
 import { Injectable } from '@nestjs/common';
-import { Feed } from '../entity/Feed';
-import { FindManyOptions, Like, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import {seeder} from './seeders/feed.seeder';
-import { FeedPageObject, Pagination } from './dto/feed.dto';
+import { FeedDto, FeedPageObject, Pagination } from './dto/feed.dto';
+import { FeedRepository } from './feed.repository';
 
 @Injectable()
 export class FeedService {
 
-    constructor(
-        @InjectRepository(Feed)
-        private feedRepository: Repository<Feed>,
-    ) {}
+    constructor(private readonly feedRepository: FeedRepository) {}
 
-    async runSeeder() {
-        await seeder(this.feedRepository)
-    }
-
+    /**
+     * this will return all the feed data 
+     */
     async getAllFeed() {
-        const result = await this.feedRepository.find({order: {dateLastEdited: "DESC"}});
-        const totalCount = await this.feedRepository.count();
+        const result = this.feedRepository.findAll();
+        const totalCount = result.length
         const pagination: Pagination = await this.getPaginationObject(totalCount, 0, totalCount);
         return this.createFeedPageObject(result, pagination);
     }
 
-    
-    feedQueryBuilder(key: string, page, limit) :FindManyOptions<Feed> {
-        let query: FindManyOptions<Feed>;
-        const offset = page*limit;
+    /**
+     * 
+     * @param key 
+     * based on the search regex pattern will be created 
+     * @returns 
+     */
+    feedQueryBuilder(key: string) {
+        let pattern: RegExp = RegExp("");
+        let words: Array<string> = []
 
-        query = {
-            order: {
-                dateLastEdited: "DESC"
-            },
-            skip: offset,
-            take: limit
-        }
         let keys: Array<string> = key.split("\"")
 
         if (!key || (keys.length>1 && !keys[1])){
-            return query;
+            return {pattern, words};
         }
         if (keys.length>1){
-            query["where"] = {
-                name: Like(`%${keys[1]}%`)
-            }
+            pattern = RegExp(`(${keys[1]})`, "gi")
+            words.push(keys[1]);
         }else{
-            keys = key.split(" ")
-            let str: string = "";
-            keys.forEach(key => {
-                str+=`%${key}%`
-            })
-            query["where"] = [{
-                name: Like(`%${str}%`)
-            }, {
-                description: Like(`%${str}%`)
-            }]
+            words = keys[0].split(" ")
+            const str = `(\\b(${words.join("|")})\\b)`
+            pattern = RegExp(str, "gi")
         }
-        return query
+        return {pattern, words}
     }
 
     async getFeedObject(key: string, page: number, limit: number) : Promise<FeedPageObject> {
-        
-        
-        const query: FindManyOptions<Feed> = this.feedQueryBuilder(key, page, limit);
-        
-        const result: Array<Feed> = await this.feedRepository.manager.getRepository(Feed).find(query)
+        const offset = page*limit;
+        const query = this.feedQueryBuilder(key)
+        const {pattern, words} = query;
 
-        const totalCount = await this.feedRepository.manager.getRepository(Feed).count(query);
+        const fields = ["name", "description"];
+        const result: Array<FeedDto> = this.feedRepository.find(pattern, words, fields, true)
+
+        const totalCount = result.length;
+
         const pagination: Pagination = await this.getPaginationObject(totalCount, page, limit);
-        return this.createFeedPageObject(result, pagination);
+        return this.createFeedPageObject(result.splice(offset, limit), pagination);
     }
 
 
@@ -81,7 +66,7 @@ export class FeedService {
         return paginationObject;
     }
 
-    createFeedPageObject(feeds: Feed[], pagination: Pagination): FeedPageObject {
+    createFeedPageObject(feeds: FeedDto[], pagination: Pagination): FeedPageObject {
         const feedPageObject = new FeedPageObject();
         feedPageObject.data = feeds;
         feedPageObject.pagination = pagination;
