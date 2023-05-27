@@ -27,7 +27,7 @@ __Table of content__
 **node.js**, **yarn**
 
 ```bash
-$ git clone https://github.com/akashkr-sharma/koto-feed-search
+$ git clone https://github.com/akashkr-sharma/kodo-feed-search
 $ cd koto-feed-search
 $ yarn install
 ```
